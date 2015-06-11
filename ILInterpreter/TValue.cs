@@ -336,6 +336,9 @@ namespace ILInterpreter
                         return UnBox();
                     }
                 }
+
+                if (t.IsArray && valueType == typeof(Array))
+                    return this;
             }
 
             if (t == typeof(bool) && valueType == null)

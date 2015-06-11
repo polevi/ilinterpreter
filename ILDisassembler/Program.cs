@@ -43,7 +43,8 @@ namespace ILDisassembler
             }
 
             Console.WriteLine("ok");
-            Console.ReadLine();
+            System.Threading.Thread.Sleep(500);
+            //Console.ReadLine();
         }
 
         static IEnumerable<MethodInfo> FindMethods(Assembly a)

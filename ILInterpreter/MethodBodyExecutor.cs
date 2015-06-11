@@ -39,7 +39,6 @@ namespace ILInterpreter
             }
         }
 
-        //BitMobile instruction
         public static int DoCALL_LOC(Frame frame, ILInstruction ili) 
         {
             Execute(frame.Package, frame.Stack, ili.Operand.AsString);
@@ -249,7 +248,10 @@ namespace ILInterpreter
         }
 
         public static int DoDUP(Frame frame, ILInstruction ili)
-        { throw new NotImplementedException(); }
+        {
+            frame.Push(frame.Stack.Peek());
+            return 0;
+        }
 
         public static int DoPOP(Frame frame, ILInstruction ili)
         {
@@ -277,6 +279,8 @@ namespace ILInterpreter
                     obj = frame.Locals[obj.Index];
                 if (obj.IsArgRef)
                     obj = frame.Arguments[obj.Index];
+                if (obj.IsArrayRef)
+                    obj = new TValue(((Array)obj.AsObject).GetValue(obj.Index)).Box();
                 if (mi.IsVirtual)
                     obj = obj.ConvertTo(mi.DeclaringType);
 
@@ -546,7 +550,7 @@ namespace ILInterpreter
         public static int DoLDOBJ(Frame frame, ILInstruction ili)
         {
             TValue arr = frame.Pop();
-            frame.Push(new TValue(((Array)arr.AsObject).GetValue(arr.Index)));
+            frame.Push(new TValue(((Array)arr.AsObject).GetValue(arr.Index)).UnBox());
             return 0;
         }
 

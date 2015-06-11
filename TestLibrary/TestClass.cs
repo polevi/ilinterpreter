@@ -12,7 +12,7 @@ namespace TestLibrary
         {
 //            Console.WriteLine("{0}  Main started", DateTime.Now.ToShortTimeString());
             TestConditions(5);
-            TestSwitch(1);
+            TestSwitch(2);
             TestBox(5);
             TestDateArray(5);
             TestArray(5);
@@ -37,6 +37,19 @@ namespace TestLibrary
             Console.WriteLine((i*i).ToString());
         }
 
+        public static int Sum(int[] arr)
+        {
+            int result = 0;
+            for (int i = 0; i < arr.Length; i++)
+            {
+                arr[i]++;
+                result += arr[i];
+
+                Console.WriteLine("arr[{0}] = {1}   result = {2}", i, arr[i], result);
+            }
+            return result;
+        }
+
         public static void TestBox(object i)
         {
             Console.WriteLine(((double)i * (double)i).ToString());
@@ -56,8 +69,7 @@ namespace TestLibrary
                 arr[i] = i;
             }
 
-            foreach(int value in arr)
-                Console.WriteLine(value);
+            Console.WriteLine("Sum is:" +  Sum(arr).ToString());
         }
 
 
