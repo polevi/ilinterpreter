@@ -280,7 +280,7 @@ namespace ILInterpreter
                 if (obj.IsArgRef)
                     obj = frame.Arguments[obj.Index];
                 if (obj.IsArrayRef)
-                    obj = new TValue(((Array)obj.AsObject).GetValue(obj.Index)).Box();
+                    obj = new TValue(((Array)obj.AsObject).GetValue(obj.Index));
                 if (mi.IsVirtual)
                     obj = obj.ConvertTo(mi.DeclaringType);
 
