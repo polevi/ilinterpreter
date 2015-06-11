@@ -9,16 +9,17 @@ namespace ILInterpreter
 {
     public struct TValue : IComparable<TValue>
     {
+        Type valueType;
+
         bool boolValue;
         sbyte sbyteValue;
         byte byteValue;
         int intValue;
         double doubleValue;
         DateTime dateTimeValue;
+        TimeSpan timeSpanValue;
 
         object objectValue;
-
-        Type valueType;
 
         byte addrFlags; //1 - local var, 2 - arguments, 3 - array
         int addrIndex;
@@ -37,7 +38,8 @@ namespace ILInterpreter
             sbyteValue = value;
         }
 
-        public TValue(byte value): this()
+        public TValue(byte value)
+            : this()
         {
             valueType = value.GetType();
             byteValue = value;
@@ -62,6 +64,13 @@ namespace ILInterpreter
         {
             valueType = value.GetType();
             dateTimeValue = value;
+        }
+
+        public TValue(TimeSpan value)
+            : this()
+        {
+            valueType = value.GetType();
+            timeSpanValue = value;
         }
 
         public TValue(object value)
@@ -89,38 +98,7 @@ namespace ILInterpreter
             : this()
         {
             valueType = t;
-            if (t == typeof(bool))
-            {
-                boolValue = bool.Parse(value);
-                return;
-            }
-            if (t == typeof(sbyte))
-            {
-                sbyteValue = sbyte.Parse(value);
-                return;
-            }
-            if (t == typeof(byte))
-            {
-                byteValue = byte.Parse(value);
-                return;
-            }
-            if (t == typeof(int))
-            {
-                intValue = int.Parse(value);
-                return;
-            }
-            if (t == typeof(double))
-            {
-                doubleValue = double.Parse(value);
-                return;
-            }
-            if (t == typeof(DateTime))
-            {
-                dateTimeValue = DateTime.Parse(value);
-                return;
-            }
-
-            throw new NotImplementedException();
+            TValueHelper.Parse(ref this, value);
         }
 
 //--------------------------------------------------addresses --------------------------------------------------------------------
@@ -194,66 +172,55 @@ namespace ILInterpreter
 
         public bool AsBoolean
         {
-            get
-            {
-                return boolValue;
-            }
+            get { return boolValue; }
+            set { boolValue = value; }
         }
 
         public sbyte AsSByte
         {
-            get
-            {
-                return sbyteValue;
-            }
+            get { return sbyteValue; }
+            set { sbyteValue = value; }
         }
 
         public byte AsByte
         {
-            get
-            {
-                return byteValue;
-            }
+            get { return byteValue; }
+            set { byteValue = value; }
         }
 
         public int AsInt
         {
-            get
-            {
-                return intValue;
-            }
+            get { return intValue; }
+            set { intValue = value; }
         }
 
         public double AsDouble
         {
-            get
-            {
-                return doubleValue;
-            }
+            get { return doubleValue; }
+            set { doubleValue = value; }
         }
 
         public DateTime AsDateTime
         {
-            get
-            {
-                return dateTimeValue;
-            }
+            get { return dateTimeValue; }
+            set { dateTimeValue = value; }
+        }
+
+        public TimeSpan AsTimeSpan
+        {
+            get { return timeSpanValue; }
+            set { timeSpanValue = value; }
         }
 
         public object AsObject
         {
-            get
-            {
-                return objectValue;
-            }
+            get { return objectValue; }
+            set { objectValue = value; }
         }
 
         public String AsString
         {
-            get
-            {
-                return objectValue == null ? null : objectValue.ToString();
-            }
+            get { return objectValue == null ? null : objectValue.ToString(); }
         }
 
         public TValue Box()
@@ -267,25 +234,7 @@ namespace ILInterpreter
             if (objectValue != null)
                 return this;
 
-            if (valueType == typeof(bool))
-                objectValue = boolValue;
-            else
-                if (valueType == typeof(sbyte))
-                    objectValue = sbyteValue;
-                else
-                    if (valueType == typeof(byte))
-                        objectValue = byteValue;
-                    else
-                        if (valueType == typeof(int))
-                            objectValue = intValue;
-                        else
-                            if (valueType == typeof(double))
-                                objectValue = doubleValue;
-                            else
-                                if (valueType == typeof(DateTime))
-                                    objectValue = dateTimeValue;
-                                else
-                                    throw new NotImplementedException();
+            TValueHelper.Box(ref this);
 
             return this;
         }
@@ -296,35 +245,16 @@ namespace ILInterpreter
                 return this;
             else
             {
-                if (valueType == typeof(bool))
-                    boolValue = (bool)objectValue;
-                else
-                    if (valueType == typeof(sbyte))
-                        sbyteValue = (sbyte)objectValue;
-                    else
-                        if (valueType == typeof(byte))
-                            byteValue = (byte)objectValue;
-                        else
-                            if (valueType == typeof(int))
-                                intValue = (int)objectValue;
-                            else
-                                if (valueType == typeof(double))
-                                    doubleValue = (double)objectValue;
-                                else
-                                    if (valueType == typeof(DateTime))
-                                        dateTimeValue = (DateTime)objectValue;
-                                    else
-                                        throw new NotImplementedException();
+                TValueHelper.Unbox(ref this);
 
                 objectValue = null;
+
                 return this;
             }
         }
 
         public TValue ConvertTo(Type t)
         {
-            //TODO is there a sense in returning new object ?
-
             if (valueType != null)
             {
                 if (t.Equals(valueType))
@@ -341,119 +271,20 @@ namespace ILInterpreter
                     return this;
             }
 
-            if (t == typeof(bool) && valueType == null)
-                return new TValue(false);
-
-            if (t == typeof(bool) && valueType == typeof(bool))
-                return this;
-
-            if (t == typeof(bool) && valueType == typeof(sbyte))
-                return new TValue(sbyteValue!=0);
-
-            if (t == typeof(bool) && valueType == typeof(byte))
-                return new TValue(byteValue != 0);
-
-            if (t == typeof(bool) && valueType == typeof(int))
-                return new TValue(intValue != 0);
-
-            if (t == typeof(bool) && valueType == typeof(double))
-                return new TValue(doubleValue != 0);
-
-
-            if (t == typeof(sbyte) && valueType == null)
-                return new TValue((sbyte)0);
-
-            if (t == typeof(sbyte) && valueType == typeof(bool))
-                return new TValue(sbyteValue != 0);
-
-            if (t == typeof(sbyte) && valueType == typeof(sbyte))
-                return this;
-
-            if (t == typeof(sbyte) && valueType == typeof(byte))
-                return new TValue((sbyte)byteValue);
-
-            if (t == typeof(sbyte) && valueType == typeof(int))
-                return new TValue((sbyte)intValue);
-
-            if (t == typeof(sbyte) && valueType == typeof(double))
-                return new TValue((sbyte)doubleValue);
-
-
-            if(t == typeof(byte) && valueType == null)
-                return new TValue((byte)0);
-
-            if (t == typeof(byte) && valueType == typeof(bool))
-                return new TValue(byteValue != 0);
-
-            if (t == typeof(byte) && valueType == typeof(sbyte))
-                return new TValue((byte)sbyteValue);
-
-            if(t == typeof(byte) && valueType == typeof(byte))
-                return this;
-
-            if(t == typeof(byte) && valueType == typeof(int))
-                return new TValue((byte)intValue);
-
-            if(t == typeof(byte) && valueType == typeof(double))
-                return new TValue((byte)doubleValue);
-
-
-            if(t == typeof(int) && valueType == null)
-                return new TValue((int)0);
-
-            if (t == typeof(int) && valueType == typeof(bool))
-                return new TValue(intValue != 0);
-
-            if (t == typeof(int) && valueType == typeof(sbyte))
-                return new TValue((int)sbyteValue);
-
-            if(t == typeof(int) && valueType == typeof(byte))
-                return new TValue((int)byteValue);
-
-            if(t == typeof(int) && valueType == typeof(int))
-                return this;
-
-            if(t == typeof(int) && valueType == typeof(double))
-                return new TValue((int)doubleValue);
-
-
-            if(t == typeof(double) && valueType == null)
-                return new TValue((double)0);
-
-            if (t == typeof(double) && valueType == typeof(bool))
-                return new TValue(doubleValue != 0);
-
-            if (t == typeof(double) && valueType == typeof(sbyte))
-                return new TValue((double)sbyteValue);
-
-            if(t == typeof(double) && valueType == typeof(byte))
-                return new TValue((double)byteValue);
-
-            if(t == typeof(double) && valueType == typeof(int))
-                return new TValue((double)intValue);
-
-            if(t == typeof(double) && valueType == typeof(double))
-                return this;
-
-            if (t == typeof(DateTime) && valueType == typeof(DateTime) && objectValue != null)
-            {
-                dateTimeValue = (DateTime)objectValue;
-                objectValue = null;
-                return this;
-            }
-
             if (t == typeof(object))
             {
                 //value is already boxed
                 return this;
             }
 
+            return TValueHelper.ConvertTo(ref this, t);
+
             throw new NotImplementedException();
         }
 
         public int CompareTo(TValue other)
         {
-            return this.AsInt.CompareTo(other.AsInt);
+            return this.AsInt.CompareTo(other.AsInt); //???
         }
 
         public bool CheckIfFalseNullZero()
@@ -464,23 +295,10 @@ namespace ILInterpreter
             if (!valueType.IsValueType)
                 return objectValue == null;
 
-            if (valueType == typeof(bool))
-                return boolValue == false;
-
-            if (valueType == typeof(sbyte))
-                return sbyteValue == 0;
-
-            if (valueType == typeof(byte))
-                return byteValue == 0;
-
-            if (valueType == typeof(int))
-                return intValue == 0;
-
-            if (valueType == typeof(double))
-                return doubleValue == 0;
-
-            throw new NotImplementedException();
+            return TValueHelper.CheckIfFalseNullZero(ref this);
         }
+
+        
     }
 
 }

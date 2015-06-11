@@ -11,7 +11,12 @@ namespace TestLibrary
         public static void Main(string[] args)
         {
 //            Console.WriteLine("{0}  Main started", DateTime.Now.ToShortTimeString());
-            Eratospen(100);
+
+            DateTime b = DateTime.Now;
+            Eratospen(100000);
+            Console.WriteLine((DateTime.Now - b));
+
+            Console.WriteLine();
             TestConditions(5);
             TestSwitch(2);
             TestBox(5);
@@ -136,18 +141,14 @@ namespace TestLibrary
                     a[i] = 1; // присваивание данному числу значение простого
                 }
             }
-            int q = 0; // вывод всех простых чисел
+
+            // вывод всех простых чисел
             for (i = 2; i < n; i++) //по 5 чисел в строке
             {
                 if (a[i] == 1)
                 {
-                    s = s + i + ' ';
-                    q++;
-                    if (q % 5 == 0)
-                    {
-                        Console.WriteLine(s);
-                        s = "";
-                    }
+                    s = s + i + "`";
+                    //Console.WriteLine(s);
                 }
             }
         }
