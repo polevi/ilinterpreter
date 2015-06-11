@@ -11,6 +11,7 @@ namespace TestLibrary
         public static void Main(string[] args)
         {
 //            Console.WriteLine("{0}  Main started", DateTime.Now.ToShortTimeString());
+            Eratospen(100);
             TestConditions(5);
             TestSwitch(2);
             TestBox(5);
@@ -114,5 +115,42 @@ namespace TestLibrary
             if (x <= 0)
                 Console.WriteLine(String.Format("{0} is less oe equals zero", x.ToString()));
         }
+
+        public static void Eratospen(int n)
+        {
+            string s = "";
+            int i, j;
+            int[] a = new int[n]; // создание массива 
+            for (i = 0; i < n; i++) // и инициализация его всеми единицами
+            {
+                a[i] = 1;
+            }
+            for (i = 2; i < n; i++) // цикл прохода по всему массиву с первого простого числа "2"
+            {
+                if (a[i] == 1)
+                {
+                    for (j = i; j < n; j += i) // вычеркивание всех чисел кратных данному невычеркнутому
+                    {
+                        a[j] = 0;
+                    }
+                    a[i] = 1; // присваивание данному числу значение простого
+                }
+            }
+            int q = 0; // вывод всех простых чисел
+            for (i = 2; i < n; i++) //по 5 чисел в строке
+            {
+                if (a[i] == 1)
+                {
+                    s = s + i + ' ';
+                    q++;
+                    if (q % 5 == 0)
+                    {
+                        Console.WriteLine(s);
+                        s = "";
+                    }
+                }
+            }
+        }
+
     }
 }

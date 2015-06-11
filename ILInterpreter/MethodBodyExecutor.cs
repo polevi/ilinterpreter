@@ -480,7 +480,12 @@ namespace ILInterpreter
         { throw new NotImplementedException(); }
 
         public static int DoREM(Frame frame, ILInstruction ili)
-        { throw new NotImplementedException(); }
+        {
+            TValue v2 = frame.Pop();
+            TValue v1 = frame.Pop();
+            frame.Push(MathHelper.Rem(v1, v2));
+            return 0;
+        }
 
         public static int DoREM_UN(Frame frame, ILInstruction ili)
         { throw new NotImplementedException(); }

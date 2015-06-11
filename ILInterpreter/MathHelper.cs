@@ -60,5 +60,17 @@ namespace ILInterpreter
             throw new NotImplementedException();
         }
 
+        public static TValue Rem(TValue a, TValue b)
+        {
+            Type t = a.ValueType;
+            if (t == typeof(byte))
+                return new TValue(a.AsByte % b.AsByte);
+            if (t == typeof(int))
+                return new TValue(a.AsInt % b.AsInt);
+            if (t == typeof(Double))
+                return new TValue(a.AsDouble % b.AsDouble);
+
+            throw new NotImplementedException();
+        }
     }
 }
